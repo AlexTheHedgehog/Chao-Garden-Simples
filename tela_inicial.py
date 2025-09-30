@@ -11,9 +11,13 @@ pygame.mixer.init()
 
 from PIL import Image, ImageTk
 
+#pra criar o executavel:
+#pyinstaller --noconsole --onefile --add-data "imagens;imagens" --add-data "musica;musica" tela_inicial.py --hidden-import='PIL._tkinter_finder'
+
 #A tela de login utilizada para entrar no jogo
 class TelaInicial:
     def __init__(self, master):
+        self.modelo = Model()
         self.janela = master
         self.largura_tela = self.janela.winfo_screenwidth()
         self.altura_tela = self.janela.winfo_screenheight()
@@ -22,7 +26,7 @@ class TelaInicial:
         self.janela.geometry(f'750x450+{pos_x}+{pos_y}')
         self.janela.title('Login')
         self.janela.resizable(False, False)
-        pygame.mixer.music.load('musica/bg_music.ogg')
+        pygame.mixer.music.load(self.modelo.con.caminho('musica/bg_music.ogg'))
         pygame.mixer.music.play(-1)
         
         self.var_usuario = ttk.StringVar()
@@ -30,12 +34,11 @@ class TelaInicial:
         self.var_cad_nome = ttk.StringVar()
         self.var_cad_senha = ttk.StringVar()
         self.var_cad_senha_conf = ttk.StringVar()
-        self.modelo = Model()
         
         self.frm_logo = ttk.Frame(self.janela)
         self.frm_logo.grid(row=0, column=0)
         
-        self.game_logo = Image.open('imagens/game_logo.png')
+        self.game_logo = Image.open(self.modelo.con.caminho('imagens/game_logo.png'))
         self.game_logo = self.game_logo.resize((482, 260), Image.Resampling.LANCZOS)
         self.game_logo_Tk = ImageTk.PhotoImage(self.game_logo)
         self.lbl_img_logo = ttk.Label(self.frm_logo, image=self.game_logo_Tk)
@@ -63,7 +66,7 @@ class TelaInicial:
         self.btn_cadastrar.grid(row=2, column=2, columnspan=2)
         self.btn_cadastrar.bind('<Button-1>', self.tela_cadastro)
         
-        self.img_chao = Image.open('imagens/chao.webp')
+        self.img_chao = Image.open(self.modelo.con.caminho('imagens/chao.webp'))
         self.img_chao = self.img_chao.resize((215, 344), Image.Resampling.LANCZOS)
         self.img_chao_Tk = ImageTk.PhotoImage(self.img_chao)
         self.lbl_img_chao = ttk.Label(self.janela, image=self.img_chao_Tk)
@@ -71,7 +74,7 @@ class TelaInicial:
         self.lbl_img_chao.grid(row=0, column=1, rowspan=2)
     
     #Utilizado para fazer o login em si
-    #funciona pertando a tecla Enter no entry da senha e no botão "entrar"
+    #funciona apertando a tecla Enter no entry da senha e no botão "entrar"
     #tambem cria o toplevel da tela do jogo e carrega os componentes pela classe Jogo() pra não poluir
     #esse script q ja ta gigantesco kkkkkkk
     def entrar(self, event):
@@ -86,9 +89,9 @@ class TelaInicial:
                 if bcrypt.checkpw(senha_bytes, senha_criptografada_bytes):
                     messagebox.showinfo('Login', 'Login realizado com sucesso!')
                 else:
-                    raise ValueError
+                    raise Exception
             else:
-                raise ValueError
+                raise Exception
             
             id_jogador = self.modelo.select(f"SELECT id FROM usuarios WHERE nome = '{nome}';")[0][0]
             
@@ -98,7 +101,7 @@ class TelaInicial:
             self.var_usuario.set('')
             self.var_senha.set('')
             
-        except ValueError:
+        except Exception:
             messagebox.showwarning('Aviso', 'O usuário ou a senha estão incorretos. Tente novamente.')
     
     #Abre e cria os componentes de um toplevel para a tela de cadastro em que o usuario inclui os dados no BD
@@ -142,13 +145,13 @@ class TelaInicial:
         try:
             if nome == '' or senha == '' or senha_conf == '':
                 messagebox.showwarning('Aviso', 'Todos os campos devem ser preenchidos!')
-                raise ValueError
+                raise Exception
             if nome in [i[0] for i in self.modelo.select('SELECT nome FROM usuarios;')]:
                 messagebox.showwarning('Aviso', 'Usuário já registrado no sistema!')
-                raise ValueError
+                raise Exception
             if senha != senha_conf:
                 messagebox.showwarning('Aviso', 'Senhas devem ser iguais!')
-                raise ValueError
+                raise Exception
             
             senha_em_bytes = senha.encode('utf-8')
             senha_criptografada = bcrypt.hashpw(senha_em_bytes, bcrypt.gensalt())
@@ -157,7 +160,7 @@ class TelaInicial:
             self.modelo.comando(sql)
             messagebox.showinfo('Sucesso', 'Usuário cadastrado com sucesso!')
             self.top_cadastro.destroy()
-        except ValueError:
+        except Exception:
             pass
 
 #Roda a janela principal do programa

@@ -4,7 +4,6 @@ from tkinter import messagebox
 from model import Model
 from PIL import Image, ImageTk
 from random import randint
-from time import strftime
 
 class Jogo:
     #Inicia a classe da tela do jogo e define os componentes
@@ -52,7 +51,7 @@ class Jogo:
         self.lbl_fome = ttk.Label(self.frm_status, text='Fome: 100%')
         self.lbl_fome.pack()
         
-        self.img_chao = Image.open('imagens/sprite_chao.png')
+        self.img_chao = Image.open(self.modelo.con.caminho('imagens/sprite_chao.png'))
         self.img_chao = self.img_chao.resize((304, 304), Image.Resampling.LANCZOS)
         self.img_chaoTk = ImageTk.PhotoImage(self.img_chao)
         self.lbl_img_chao = ttk.Label(self.frm_main, image=self.img_chaoTk)
@@ -129,13 +128,13 @@ class Jogo:
         try:
             nome = self.nome.get()
             if nome == '':
-                raise ValueError
+                raise Exception
             self.modelo.comando(f'INSERT INTO chao (nome, carinho, higiene, diversao, sono, fome, jog_id) VALUES ("{nome}", {randint(80, 100)}, {randint(80, 100)}, {randint(80, 100)}, {randint(80, 100)}, {randint(80, 100)}, {self.id_jogador});')
             messagebox.showinfo('Nome confirmado', 'Chao nomeado com sucesso!')
             self.atualizar_tela()
             self.janela.deiconify()
             self.tela_nomear.destroy()
-        except:
+        except Exception:
             messagebox.showwarning('Campo não preenchido', 'Você deve dar um nome a seu chao!')
         
     #Atualiza as informações das strings na tela e força o reinício se necessario
@@ -146,10 +145,10 @@ class Jogo:
             #isso ta aqui por que quando a tela de nomear fecha ele tira o grab set por algum motivo (???)
             self.janela.grab_set()
             if self.id_jogador not in [i[0] for i in self.modelo.select('SELECT jog_id FROM chao;')]:
-                raise ValueError
+                raise Exception
             if 0 in self.modelo.select(f'SELECT * FROM chao WHERE jog_id = {self.id_jogador};')[0][2:-1]:
                 messagebox.showinfo('Game Over', 'Seu chao faleceu! o jogo será reiniciado.')
-                raise ValueError
+                raise Exception
             
             nome, carinho, higiene, diversao, sono, fome = self.modelo.select(f'SELECT * FROM chao WHERE jog_id = {self.id_jogador};')[0][1:-1]
             self.lbl_nome.config(text=f'Nome: {nome}')
@@ -158,7 +157,7 @@ class Jogo:
             self.lbl_diversao.config(text=f'Diversão: {diversao}%')
             self.lbl_sono.config(text=f'Sono: {sono}%')
             self.lbl_fome.config(text=f'Fome: {fome}%')
-        except ValueError:
+        except Exception:
             self.conf_resetar(True)
     
     #realiza o algoritmo das porcentagens após cada ação realizada
