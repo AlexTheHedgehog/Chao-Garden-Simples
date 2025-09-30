@@ -1,0 +1,23 @@
+@startuml
+title Diagrama de Casos de Uso Corrigido - Chao Garden
+
+actor Jogador
+
+usecase "Cadastrar Usuário" as UC_Cadastro
+usecase "Fazer Login" as UC_Login
+usecase "Cuidar do Chao" as UC_Cuidar
+usecase "Salvar Jogo" as UC_Salvar
+usecase "Reiniciar Jogo" as UC_Reiniciar
+usecase "Ir Para a Tela de Game Over" as UC_GameOver
+
+Jogador -- UC_Cadastro
+Jogador -- UC_Login
+Jogador -- UC_Cuidar
+
+UC_Cuidar .> UC_Login : <<extends>>
+(UC_Cuidar) -- UC_Salvar
+(UC_Cuidar) -- UC_Reiniciar
+UC_Cuidar -- UC_GameOver
+UC_GameOver ..> UC_Reiniciar: <<include>>
+
+@enduml

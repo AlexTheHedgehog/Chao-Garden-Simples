@@ -1,0 +1,19 @@
+@startuml
+'Casos de uso do projeto Chao Garden.
+
+actor Jogador
+
+Jogador -- (Cadastro)
+Jogador -- (Login)
+Jogador -- (Gerenciar Jogo)
+
+(Gerenciar Jogo) ..> (Definir Nome do Chao) : <<include>>
+(Gerenciar Jogo) -- (Salvar Jogo)
+(Gerenciar Jogo) -- (Resetar Jogo)
+(Gerenciar Jogo) -- (Interagir Com o Chao)
+
+(Acariciar) --|> (Interagir Com o Chao)
+(Dar Banho) --|> (Interagir Com o Chao)
+(Brincar) --|> (Interagir Com o Chao)
+(Fazer Dormir) --|> (Interagir Com o Chao)
+(Alimentar) --|> (Interagir Com o Chao)

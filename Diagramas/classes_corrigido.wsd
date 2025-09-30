@@ -1,0 +1,83 @@
+@startuml
+title Diagrama de Classes Corrigido - Chao Garden (Modelo de Domínio)
+
+' --- Classes de Modelo (Representam os dados) ---
+class Usuario {
+  - id: int
+  - username: str
+  - senha_cripto: str
+  __
+  + verificar_senha(senha_fornecida) : bool
+}
+
+class Chao {
+  - id: int
+  - nome: str
+  - carinho: int
+  - higiene: int
+  - diversao: int
+  - sono: int
+  - fome: int
+  - lista_status: List
+  __
+  + aplicar_acao(acao)
+  + decair_status(num_aleatorio)
+  + esta_vivo(lista_status) : bool
+}
+
+class Partida {
+  - usuario: Usuario
+  - chao: Chao
+}
+
+' --- Classes de Serviço (Representam a lógica de negócio) ---
+class ServicoUsuario {
+  - repositorio: UsuarioRepositorio
+  __
+  + cadastrar(apelido, senha, senha_dnv) : Usuario
+  + login(apelido, senha) : Usuario
+}
+
+class ServicoPartida {
+  - repositorio: PartidaRepositorio
+  __
+  + iniciar_nova_partida(usuario, nome_chao) : Partida
+  + carregar_partida(usuario) : Partida
+  + executar_acao(partida, acao)
+  + salvar_partida(partida)
+  + verificar_gameover(partida) : bool
+}
+
+' --- Classes de Repositório (Abstraem o acesso a dados) ---
+interface UsuarioRepositorio {
+  + buscar_por_nome(apelido) : Usuario
+  + salvar(usuario)
+}
+
+interface PartidaRepositorio {
+  + buscar_por_usuario(usuario) : Partida
+  + salvar(partida)
+}
+
+
+' --- Relacionamentos ---
+Partida "1" o-- "1" Usuario
+Partida "1" *-- "1" Chao
+
+ServicoUsuario ..> UsuarioRepositorio : usa
+ServicoPartida ..> PartidaRepositorio : usa
+
+ServicoPartida ..> Partida : gerencia
+ServicoUsuario ..> Usuario : gerencia
+
+'note as N1
+'  <b>Nota de Arquitetura:</b>
+'  Este é um <b>Diagrama de Domínio</b>.
+'  Classes de UI (TelaLogin, TelaJogo, TelaGameOver)
+'  e de acesso a dados (classes que implementam
+'  os Repositórios com SQLite) existem no código-fonte,
+'  mas são omitidas aqui para focar nos conceitos
+'  e regras de negócio do jogo, como solicitado.
+'end note
+
+@enduml

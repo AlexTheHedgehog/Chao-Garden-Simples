@@ -1,0 +1,62 @@
+@startuml
+'Diagrama de Classes do projeto Chao Garden.
+
+class Jogador{
+    -apelido: str
+    -senha_criptografada: str
+    -id: int
+}
+
+class GerenciadorJogo{
+    -jogador: Jogador
+    -chao: Chao
+    -janela: Tela
+    +login(apelido, senha): bool
+    +cadastrar(apelido, senha): bool
+    +nomear_chao(nome)
+    +salvar()
+    +resetar()
+    +interagir_chao()
+    +verificar_morte(chao)
+}
+
+class Chao{
+    -carencia: int
+    -limpeza: int
+    -diversao: int
+    -sono: int
+    -fome: int
+    -status: list
+    -morte: bool
+    +aumentar_status(var_status, valor)
+    +diminuir_status(var_status, valor_rand)
+    +is_chao_vivo(status): bool
+}
+
+class Tela{
+    -controlador: GerenciadorJogo
+    -... (widgets do Tkinter)
+    __
+    +mostrar_tela()
+    +atualizar_tela()
+    +msg_erro()
+}
+
+class BancoDeDados{
+    -conexao: Connection
+    -cursor: Cursor
+    +iniciar()
+    +adicionar_usuario(apelido, senha): bool
+    +verificar_credenciais(apelido, senha): bool
+    +salvar_chao(chao)
+    +carregar_chao(Jogador): Chao
+    +reiniciar_chao(chao)
+}
+
+GerenciadorJogo "1" o-- "1" BancoDeDados: usa >
+GerenciadorJogo "1" o-- "1" Tela: controla >
+
+GerenciadorJogo "1" --> "1" Jogador: gerencia >
+GerenciadorJogo "1" --> "1" Chao: gerencia >
+
+Jogador "1" -- "1" Chao: possui >
