@@ -31,6 +31,7 @@ class Conexao:
                     diversao INTEGER NOT NULL,
                     sono INTEGER NOT NULL,
                     fome INTEGER NOT NULL,
+                    pontos INTEGER NOT NULL,
                     jog_id INTEGER NOT NULL,
                     FOREIGN KEY (jog_id) REFERENCES usuarios (id)
                 );

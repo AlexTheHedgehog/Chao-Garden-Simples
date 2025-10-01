@@ -12,7 +12,7 @@ pygame.mixer.init()
 from PIL import Image, ImageTk
 
 #pra criar o executavel:
-#pyinstaller --noconsole --onefile --add-data "imagens;imagens" --add-data "musica;musica" tela_inicial.py --hidden-import='PIL._tkinter_finder'
+#pyinstaller --noconsole --onefile --add-data "imagens;imagens" --add-data "musica;musica" --name "ChaoGarden" tela_inicial.py --hidden-import='PIL._tkinter_finder'
 
 #A tela de login utilizada para entrar no jogo
 class TelaInicial:

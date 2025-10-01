@@ -36,8 +36,10 @@ class Jogo:
         self.frm_status = ttk.Frame(self.frm_main)
         self.frm_status.grid(row=0, column=0)
         
-        self.lbl_nome = ttk.Label(self.frm_status, text='Nome: Teste\n') #text=chao.nome
+        self.lbl_nome = ttk.Label(self.frm_status, text='Nome: Teste') #text=chao.nome
         self.lbl_nome.pack()
+        self.lbl_pontos = ttk.Label(self.frm_status, text='Pontuação: 0')
+        self.lbl_pontos.pack()
         self.lbl_status = ttk.Label(self.frm_status, text='STATUS:')
         self.lbl_status.pack()
         self.lbl_carinho = ttk.Label(self.frm_status, text='Carinho: 100%')
@@ -129,7 +131,8 @@ class Jogo:
             nome = self.nome.get()
             if nome == '':
                 raise Exception
-            self.modelo.comando(f'INSERT INTO chao (nome, carinho, higiene, diversao, sono, fome, jog_id) VALUES ("{nome}", {randint(80, 100)}, {randint(80, 100)}, {randint(80, 100)}, {randint(80, 100)}, {randint(80, 100)}, {self.id_jogador});')
+            self.pontos = 0
+            self.modelo.comando(f'INSERT INTO chao (nome, carinho, higiene, diversao, sono, fome, pontos, jog_id) VALUES ("{nome}", {randint(80, 100)}, {randint(80, 100)}, {randint(80, 100)}, {randint(80, 100)}, {randint(80, 100)}, 0, {self.id_jogador});')
             messagebox.showinfo('Nome confirmado', 'Chao nomeado com sucesso!')
             self.atualizar_tela()
             self.janela.deiconify()
@@ -146,12 +149,15 @@ class Jogo:
             self.janela.grab_set()
             if self.id_jogador not in [i[0] for i in self.modelo.select('SELECT jog_id FROM chao;')]:
                 raise Exception
-            if 0 in self.modelo.select(f'SELECT * FROM chao WHERE jog_id = {self.id_jogador};')[0][2:-1]:
-                messagebox.showinfo('Game Over', 'Seu chao faleceu! o jogo será reiniciado.')
+            
+            nome, carinho, higiene, diversao, sono, fome, pontos = self.modelo.select(f'SELECT * FROM chao WHERE jog_id = {self.id_jogador};')[0][1:-1]
+            
+            if 0 in self.modelo.select(f'SELECT * FROM chao WHERE jog_id = {self.id_jogador};')[0][2:-2]:
+                messagebox.showinfo('Game Over', f'Seu chao faleceu!\nPontuação final: {pontos-1}\no jogo será reiniciado.')
                 raise Exception
             
-            nome, carinho, higiene, diversao, sono, fome = self.modelo.select(f'SELECT * FROM chao WHERE jog_id = {self.id_jogador};')[0][1:-1]
             self.lbl_nome.config(text=f'Nome: {nome}')
+            self.lbl_pontos.config(text=f'Pontuação: {pontos}')
             self.lbl_carinho.config(text=f'Carinho: {carinho}%')
             self.lbl_higiene.config(text=f'Higiene: {higiene}%')
             self.lbl_diversao.config(text=f'Diversão: {diversao}%')
@@ -171,33 +177,24 @@ class Jogo:
     def agir(self, acao):
         acoes = ['carinho', 'higiene', 'diversao', 'sono', 'fome']
         valores = [int(i) for i in self.modelo.select(f'SELECT * FROM chao WHERE jog_id = {self.id_jogador};')[0][2:-1]]
-        
-        if acao == acoes[0]:
-            valor_mod = acoes[0]
-        elif acao == acoes[1]:
-            valor_mod = acoes[1]
-        elif acao == acoes[2]:
-            valor_mod = acoes[2]
-        elif acao == acoes[3]:
-            valor_mod = acoes[3]
-        elif acao == acoes[4]:
-            valor_mod = acoes[4]
+        valor_mod = acao
         
         for i in range(0, 5):
             if acoes[i] == valor_mod:
-                if valores[i] + 15 >= 100:
+                if valores[i] + 20 >= 100:
                     valor_novo = 100
                 else:
-                    valor_novo = valores[i]+15
+                    valor_novo = valores[i]+20
             else:
-                num = randint(1, 20)
+                num = randint(1, 10)
                 if valores[i] - num < 0:
                     valor_novo = 0
                 else:
                     valor_novo = valores[i]-num
                 
             self.modelo.comando(f'UPDATE chao SET {acoes[i]} = {valor_novo} WHERE jog_id = {self.id_jogador};')
-        
+            
+        self.modelo.comando(f'UPDATE chao SET pontos = {valores[5]+1} WHERE jog_id = {self.id_jogador};')
         self.atualizar_tela()
     
     #funções ligadas a cada botão de ação que redirecionam à função self.agir()
