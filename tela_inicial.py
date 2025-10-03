@@ -164,6 +164,9 @@ class TelaInicial:
             sql = f'INSERT into usuarios (nome, senha) VALUES ("{nome}", "{senha_criptografada}");'
             self.modelo.comando(sql)
             messagebox.showinfo('Sucesso', 'Usuário cadastrado com sucesso!')
+            self.var_cad_nome.set('')
+            self.var_cad_senha.set('')
+            self.var_cad_senha_conf.set('')
             self.top_cadastro.destroy()
         except Exception:
             pass
